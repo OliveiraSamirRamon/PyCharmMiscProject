@@ -2,18 +2,18 @@
 from tabulate import tabulate
 import random
 
-class Produto:
-    def __init__(self, id, descricao, valor):
-        self.id = id
+class Entradas:
+    def __init__(self, descricao, valor):
+        self.id = random.randint(100, 9999)
         self.descricao = descricao
         self.valor = valor
 
 produtos = [
-    Produto(random.randint(100, 999), "teste", 11.1), 
-    Produto(random.randint(100, 999), "teste", 122.1), 
-    Produto(random.randint(100, 999), "aaa", 122.1),
-    Produto(random.randint(100, 999), "bbb", 122.1),
-    Produto(random.randint(100, 999), "ccc", 122.1),
+    Entradas("teste", 11.1), 
+    Entradas("teste", 122.1), 
+    Entradas("aaa", 122.1),
+    Entradas("bbb", 122.1),
+    Entradas("ccc", 122.1),
     ]
 
 print("--------------------------------------------------------------------------------------------")
@@ -56,10 +56,10 @@ def abrirMenuSelecionado(valor):
             abrirMenuSelecionado()
 
 def escolheOpcao():
-    valor = validaEntrada()
+    valor = validaEntradaMenu()
     abrirMenuSelecionado(valor)
 
-def validaEntrada():
+def validaEntradaMenu():
     while True:
         try:
             valor = int(input("Digite um número: "))
@@ -68,23 +68,35 @@ def validaEntrada():
             print("Entrada inválida! Digite apenas números.")
     return valor
 
+def validarEntradaValor():
+    while True:
+        try:
+            valor = float(input("Valor: "))
+            break
+        except ValueError:
+            print("Valor inválido")
+    valor = float(f"{valor:.2f}")
+    return valor
+
 def abrirMenuCadastrar():
     print("------------------------------Cadastro------------------------------")
     descricao = str(input("Descricacao: "))
-    valor = float(input("Valor: "))
+    valor = validarEntradaValor()
     resposta = confirmacao()
     if resposta == "sim":
-        produtos.append(Produto(random.randint(100, 999), descricao, valor))
+        produtos.append(Entradas(descricao, valor))
         print(f"Descricao {descricao} | Valor: {valor}")
         abrirMenuOpcoes()
     elif resposta == "nao":
         abrirMenuCadastrar()
 
 def confirmacao():
-    resposta = str(input("Confirma?: (sim/nao): "))
-    while(resposta != "sim" and resposta != "nao"):
+    resposta = str(input("Confirma?: (sim/nao/voltar): "))
+    while(resposta != "sim" and resposta != "nao" and resposta !="voltar"):
         print("resposta inválida")
-        resposta = str(input("Confirma?: (sim/nao): "))
+        resposta = str(input("Confirma?: (sim/nao/voltar): "))
+    if resposta == "voltar":
+        abrirMenuOpcoes()
     return resposta
 
 def abrirMenuListar():
@@ -160,10 +172,14 @@ def iniciarProcessoDeAlteracao(listaFiltrada):
         
 def alterarValor(campoParaAlteracao):
     descricao = str(input("Descricacao: "))
-    valor = str(input("Valor: "))
-    novoCampo = Produto(123, descricao, valor)
+    valor = validarEntradaValor()
+    novoCampo = Entradas(descricao, valor)
     indiceParaAlteracao = produtos.index(campoParaAlteracao)
-    produtos[indiceParaAlteracao] = novoCampo
+    resposta = confirmacao()
+    if resposta == "sim":
+        produtos[indiceParaAlteracao] = novoCampo
+    elif resposta == "nao":
+        alterarValor(campoParaAlteracao)
     abrirMenuOpcoes()
 
 def sair():
