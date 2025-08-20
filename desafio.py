@@ -1,5 +1,6 @@
 
 from tabulate import tabulate
+from art import *
 import random
 
 class Entradas:
@@ -8,15 +9,16 @@ class Entradas:
         self.descricao = descricao
         self.valor = valor
 
-produtos = [
-    Entradas("teste", 11.1), 
-    Entradas("teste", 122.1), 
-    Entradas("aaa", 122.1),
-    Entradas("bbb", 122.1),
-    Entradas("ccc", 122.1),
+entradas = [
+    Entradas("teste", 200.12), 
+    Entradas("teste", 200.24), 
+    Entradas("aaa", 200.05),
+    Entradas("bbb", 200.13),
+    Entradas("ccc", 200.10),
     ]
 
 print("--------------------------------------------------------------------------------------------")
+tprint("BEM VINDO")
 print("Bem vindo ao sistema de gestão financeira python")
 print("--------------------------------------------------------------------------------------------")
 
@@ -39,27 +41,29 @@ print("-------------------------------------------------------------------------
 # print("Bem vindo", nome)
 
 
-def abrirMenuSelecionado(valor):
+def abrir_menu_selecionado(valor):
     match valor:
         case 0:
             sair()
         case 1:
-            abrirMenuCadastrar()
+            abrir_menu_cadastrar()
         case 2:
-            abrirMenuListar()
+            abrir_menu_listar()
         case 3:
-            abriMenuApagar()
+            abrir_menu_apagar()
         case 4:
-            abrirMenuAlterar()
+            abrir_menu_alterar()
+        case 5:
+            abrir_balanco_financeiro()
         case _:
             print("valor inválido")
-            abrirMenuSelecionado()
+            abrir_menu_selecionado()
 
-def escolheOpcao():
-    valor = validaEntradaMenu()
-    abrirMenuSelecionado(valor)
+def escolhe_opcao():
+    valor = valida_entradaMenu()
+    abrir_menu_selecionado(valor)
 
-def validaEntradaMenu():
+def valida_entradaMenu():
     while True:
         try:
             valor = int(input("Digite um número: "))
@@ -68,7 +72,7 @@ def validaEntradaMenu():
             print("Entrada inválida! Digite apenas números.")
     return valor
 
-def validarEntradaValor():
+def validar_entrada_valor():
     while True:
         try:
             valor = float(input("Valor: "))
@@ -78,17 +82,17 @@ def validarEntradaValor():
     valor = float(f"{valor:.2f}")
     return valor
 
-def abrirMenuCadastrar():
+def abrir_menu_cadastrar():
     print("------------------------------Cadastro------------------------------")
     descricao = str(input("Descricacao: "))
-    valor = validarEntradaValor()
+    valor = validar_entrada_valor()
     resposta = confirmacao()
     if resposta == "sim":
-        produtos.append(Entradas(descricao, valor))
+        entradas.append(Entradas(descricao, valor))
         print(f"Descricao {descricao} | Valor: {valor}")
-        abrirMenuOpcoes()
+        abrir_menu_opcoes()
     elif resposta == "nao":
-        abrirMenuCadastrar()
+        abrir_menu_cadastrar()
 
 def confirmacao():
     resposta = str(input("Confirma?: (sim/nao/voltar): "))
@@ -96,28 +100,28 @@ def confirmacao():
         print("resposta inválida")
         resposta = str(input("Confirma?: (sim/nao/voltar): "))
     if resposta == "voltar":
-        abrirMenuOpcoes()
+        abrir_menu_opcoes()
     return resposta
 
-def abrirMenuListar():
+def abrir_menu_listar():
     print("------------------------------Listagem------------------------------")
-    dados = converterParaDic(produtos)
+    dados = converter_para_dic(entradas)
     print(tabulate(dados, headers="keys", tablefmt='orgtbl'))
-    abrirMenuOpcoes()
+    abrir_menu_opcoes()
 
-def converterParaDic(lista):
-    dados = [{"Id": p.id, "Descricao": p.descricao, "Valor": p.valor} for p in lista]
+def converter_para_dic(lista):
+    dados = [{"Id": p.id, "Descricao": p.descricao, "Valor": f"{p.valor:.2f}"} for p in lista]    
     return dados
 
-def abriMenuApagar():
+def abrir_menu_apagar():
     print("------------------------------Apagar------------------------------")
     busca = str(input("Digite o nome do campo a ser apagado: "))
-    listaFiltrada = filtrarLista(busca)
-    dados = converterParaDic(listaFiltrada)
+    listaFiltrada = filtrar_lista(busca)
+    dados = converter_para_dic(listaFiltrada)
     print(tabulate(dados, headers="keys", tablefmt='orgtbl'))
-    iniciarProcessoDeApagar(listaFiltrada)
+    iniciar_processo_de_apagar(listaFiltrada)
 
-def iniciarProcessoDeApagar(listaFiltrada):
+def iniciar_processo_de_apagar(listaFiltrada):
     if len(listaFiltrada) > 1:
             print("Existe mais de um item correspondente a busca: ")
             id = int(input("Digite o id do campo que deseja apagar: "))
@@ -128,64 +132,65 @@ def iniciarProcessoDeApagar(listaFiltrada):
     if len(listaFiltrada) == 1:
         resposta = confirmacao()
         if resposta == "sim":
-            apagarItem(listaFiltrada)
+            apagar_item(listaFiltrada)
         elif resposta == "nao":
-            abriMenuApagar()
+            abrir_menu_apagar()
     else:
         print("Campo não encontrado")
-        abriMenuApagar()
+        abrir_menu_apagar()
 
-def apagarItem(listaFiltrada):
+def apagar_item(listaFiltrada):
     indiceProduto = 0
     id = listaFiltrada[indiceProduto].id
-    for produto in produtos:
+    for produto in entradas:
         if produto.id == id:
-            produtos.remove(produto)
+            entradas.remove(produto)
             print("Campo apagado")
-            abrirMenuOpcoes()
+            abrir_menu_opcoes()
             break
 
-def filtrarLista(busca):
+def filtrar_lista(busca):
     listaFiltrada = []
-    for p in produtos:
+    for p in entradas:
         if busca.lower() in p.descricao.lower():
             listaFiltrada.append(p)
     return listaFiltrada
 
-def abrirMenuAlterar():
+def abrir_menu_alterar():
     busca = str(input("Digite o nome do campo a ser alterado: "))
-    listaFiltrada = filtrarLista(busca)
-    dados = converterParaDic(listaFiltrada)
+    listaFiltrada = filtrar_lista(busca)
+    dados = converter_para_dic(listaFiltrada)
     print(tabulate(dados, headers="keys", tablefmt='orgtbl'))
-    iniciarProcessoDeAlteracao(listaFiltrada)
+    iniciar_processo_de_alteracao(listaFiltrada)
 
-def iniciarProcessoDeAlteracao(listaFiltrada):
+def iniciar_processo_de_alteracao(listaFiltrada):
     if len(listaFiltrada) > 1:
         print("Existe mais de um item correspondente a busca: ")
         id = int(input("Digite o id do campo que deseja alterar: "))
         for item in listaFiltrada:
             if item.id == id:
-                alterarValor(item)
+                alterar_valor(item)
 
     elif len(listaFiltrada) == 1:
-        alterarValor(listaFiltrada[0])
+        alterar_valor(listaFiltrada[0])
         
-def alterarValor(campoParaAlteracao):
+def alterar_valor(campoParaAlteracao):
     descricao = str(input("Descricacao: "))
-    valor = validarEntradaValor()
+    valor = validar_entrada_valor()
     novoCampo = Entradas(descricao, valor)
-    indiceParaAlteracao = produtos.index(campoParaAlteracao)
+    indiceParaAlteracao = entradas.index(campoParaAlteracao)
     resposta = confirmacao()
     if resposta == "sim":
-        produtos[indiceParaAlteracao] = novoCampo
+        entradas[indiceParaAlteracao].descricao = novoCampo.descricao
+        entradas[indiceParaAlteracao].valor = novoCampo.valor
     elif resposta == "nao":
-        alterarValor(campoParaAlteracao)
-    abrirMenuOpcoes()
+        alterar_valor(campoParaAlteracao)
+    abrir_menu_opcoes()
 
 def sair():
-    print("Adeus!")
+    tprint("Adeus!")
 
-def abrirMenuOpcoes():
+def abrir_menu_opcoes():
     print("--------------------------------------------------------------------------------------------")
     print("O que deseja fazer hoje?: ")
     print("--------------------------------------------------------------------------------------------")
@@ -194,13 +199,18 @@ def abrirMenuOpcoes():
     "\n 2-Listar" \
     "\n 3-Apagar" \
     "\n 4-Alterar" \
+    "\n 5-Trazer balanço financeiro" \
     "\n 0-Sair do sistema" \
     "\n" \
     "")
     print("--------------------------------------------------------------------------------------------")
-    escolheOpcao()
+    escolhe_opcao()
 
-abrirMenuOpcoes()
+def abrir_balanco_financeiro():
+    total = sum(entrada.valor for entrada in entradas)
+    print("total: {:.2f}".format(total))
+    abrir_menu_opcoes()
+abrir_menu_opcoes()
 
 
 
